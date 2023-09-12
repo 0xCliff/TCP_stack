@@ -2,3 +2,6 @@
 .vscode/*
 
 env/
+
+__pycache__/
+Layer_1/__pycache__/
