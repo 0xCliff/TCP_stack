@@ -12,8 +12,11 @@ class Node:
         self.props = NetworkProperties(ip, mac, subnet)
 
     def __repr__(self) -> str:
-        output = f"{self.node_name}: {self.props.ip_addr}/{self.props.subnet_mask}, {self.props.mac_addr} \n"
+        output = f"\033[36mNode Name:\033[00m {self.node_name}\n"
+        output += f"\t\033[36mIP Addr:\033[00m \033[35m{self.props.ip_addr}/{self.props.subnet_mask}\033[00m\n"
         for intf in self.interfaces:
-            output += f"Interface: {intf.interface_name} connected to {intf.to_node.node_name}, Weight: {intf.cost}\n"
+            output += f"\t\033[36mInterface Name:\033[00m {intf.interface_name}\n"
+            output += f"\t\033[36mFrom Node:\033[00m {intf.from_node.node_name}, \033[36mTo Node:\033[00m {intf.to_node.node_name}, \033[36mWeight:\033[00m {intf.cost}\n"
+            output += f"\t\033[36mNode MAC Addr:\033[00m \033[35m{self.props.mac_addr}\033[00m\n"
         output += "\n"
         return output

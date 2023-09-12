@@ -1,10 +1,8 @@
-from Layer_1 import NetworkGraph
-from topologies import *
+from cli import TCPShell
 
 
 def main():
-    star = build_star_topology()
-    print(star.__repr__())
+    TCPShell().cmdloop()
 
 
 if __name__ == "__main__":
