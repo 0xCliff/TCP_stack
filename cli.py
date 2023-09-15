@@ -2,8 +2,8 @@ import cmd
 import os
 import platform
 
-
-from topologies import *
+from cli_functions import *
+from network_graph import NetworkGraph
 
 if platform.system() == "Windows":
     import pyreadline
@@ -15,70 +15,38 @@ else:
     clear = "clear"
 
 
-def case_insensitive_onecmd(self, line):
-    cmd, arg, line = self.parseline(line)
-    if not cmd:
-        return self.emptyline()
-    self.lastcmd = line
-    if line == "EOF":
-        self.lastcmd = ""
-    cmd = cmd.lower()
-    try:
-        func = getattr(self, "do_" + cmd)
-    except AttributeError:
-        return self.default(line)
-    return func(arg)
-
-
 cmd.Cmd.onecmd = case_insensitive_onecmd
 
 
 class TCPShell(cmd.Cmd):
-    intro = "Welcome to TCP stack simulator. Type help or ? to list commands.\n"
-    prompt = "root@tcp_stack> $ "
-    commands = ["show", "help", "config", "cls", "build"]
-    completekey = "tab"
-    config = False
+    intro: str = "Welcome to TCP stack simulator. Type help or ? to list commands.\n"
+    prompt: str = "root@tcp_stack> $ "
+    commands: list[str] = ["show", "help", "config", "cls", "build"]
+    completekey: str = "tab"
+    config_flag: bool = False
+    network: NetworkGraph | None
 
-    def emptyline(self):
+    def emptyline(self) -> None:
         return
 
-    def do_exit(self, args):
+    def do_exit(self, args) -> bool:
         """Exit from the CLI."""
-        if self.config:
-            self.prompt = "root@tcp_stack> $ "
-            self.config = False
-        else:
-            print("Goodbye!")
-            return True
+        return exit_function(self)
 
-    def do_config(self, args):
+    def do_config(self, args) -> None:
         """Enter configuration mode."""
         self.prompt = "root@tcp_stack(config)> $ "
-        self.config = True
+        self.config_flag = True
 
-    def do_build(self, args):
+    def do_build(self, args) -> None:
         """Build a topology"""
-        if self.config:
-            pass
-        else:
-            print("You must be config mode to build.")
+        self.network = build_function(self)
 
-    def do_show(self, args: str):
+    def do_show(self, args: str) -> None:
         """Display <argument>"""
-        arg_list = args.split()
-        if len(arg_list) >= 1:
-            if arg_list[0] == "topologies":
-                try:
-                    print("\n")
-                    star = build_star_topology()
-                    print(star)
-                except:
-                    pass
-        else:
-            print("<show> command requires an <argument>.")
+        show_function(self, args)
 
-    def do_cls(self, args):
+    def do_cls(self, args) -> None:
         """Clear the screen."""
         os.system(clear)
 
